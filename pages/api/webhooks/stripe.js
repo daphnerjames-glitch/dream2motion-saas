@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import { MongoClient, ObjectId } from 'mongodb';
-import { buffer } from 'micro';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -13,12 +12,20 @@ export const config = {
   },
 };
 
+async function getRawBody(readable) {
+  let data = '';
+  for await (const chunk of readable) {
+    data += chunk;
+  }
+  return data;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const buf = await buffer(req);
+  const buf = await getRawBody(req);
   const sig = req.headers['stripe-signature'];
 
   let event;
