@@ -58,6 +58,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    if (!STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'STRIPE_SECRET_KEY not configured' });
+    }
+    if (!MONGODB_URI) {
+      return res.status(500).json({ error: 'MONGODB_URI not configured' });
+    }
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      return res.status(500).json({ error: 'NEXT_PUBLIC_API_URL not configured' });
+    }
+
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     const db = client.db('dream2motion');
