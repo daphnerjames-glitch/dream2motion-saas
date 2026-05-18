@@ -83,36 +83,4 @@ export default function Home() {
 
           <div className={styles.plan}>
             <h3>Pro</h3>
-            <p className={styles.price}>$29/month</p>
-            <ul>
-              <li>20 videos/month</li>
-              <li>Up to 5 minutes each</li>
-              <li>Auto-post to YouTube</li>
-              <li>Priority support</li>
-            </ul>
-            <button onClick={handleChoosePlan} style={{ cursor: 'pointer', padding: '10px 20px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px' }}>Choose Plan</button>
-          </div>
-
-          <div className={styles.plan}>
-            <h3>Studio</h3>
-            <p className={styles.price}>$79/month</p>
-            <ul>
-              <li>Unlimited videos</li>
-              <li>Up to 30 minutes each</li>
-              <li>Auto-post to YouTube</li>
-              <li>Priority support</li>
-              <li>Custom branding</li>
-            </ul>
-            <button onClick={handleChoosePlan} style={{ cursor: 'pointer', padding: '10px 20px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px' }}>Choose Plan</button>
-          </div>
-        </div>
-
-        <p className={styles.payAsYouGo}>Or pay per video: $3 (short) · $7 (medium) · $15 (long)</p>
-      </section>
-
-      <footer className={styles.footer}>
-        <p>&copy; 2026 Dream2Motion.ai. All rights reserved.</p>
-      </footer>
-    </div>
-  );
-}
+            <p className={styles.price}

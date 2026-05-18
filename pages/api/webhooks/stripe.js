@@ -125,10 +125,4 @@ export default async function handler(req, res) {
 
         await client.close();
       } catch (error) {
-        console.error('Error processing recurring payment:', error);
-      }
-    }
-  }
-
-  return res.status(200).json({ received: true });
-}
+        console.error('Error proc

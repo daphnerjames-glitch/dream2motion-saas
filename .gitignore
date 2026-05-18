@@ -15,5 +15,3 @@ build/
 *.swo
 ~*
 ".env" 
-.vercel
-.env*.local
