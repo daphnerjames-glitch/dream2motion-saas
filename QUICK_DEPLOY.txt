@@ -1,0 +1,58 @@
+QUICK DEPLOY - AUTONOMOUS INCOME ENGINE
+========================================
+
+PREREQUISITE: Google Cloud SDK (gcloud) must be installed and authenticated.
+
+If gcloud is NOT installed:
+1. Go to: https://cloud.google.com/sdk/docs/install-sdk
+2. Download and run the installer for Windows
+3. Restart your Command Prompt
+4. Run: gcloud auth login (and authenticate with your account)
+5. Then come back here and follow the steps below
+
+DEPLOYMENT:
+===========
+
+1. Open Command Prompt (not PowerShell)
+2. Navigate to your project folder:
+   cd C:\Users\daphn\Desktop\Brain
+
+3. Run the deployment script:
+   powershell -ExecutionPolicy Bypass -File DEPLOY.ps1
+
+4. Wait for it to complete (shows "✓ Deployment Complete!")
+
+5. Once complete, go to your Google Sheet and:
+   - Run testEngine() from Apps Script
+   - Check row H for "success"
+   - Check row I for YouTube URLs
+   - Wait 5-10 minutes for videos to appear
+
+TROUBLESHOOTING:
+================
+
+If you get "'gcloud' is not recognized":
+   - gcloud CLI is not installed or not in your PATH
+   - Follow the installation link above
+   - Restart Command Prompt after installing
+   - Try again
+
+If deployment fails with permission error:
+   - Make sure you're logged in with: gcloud auth login
+   - Make sure you're in the correct Google Cloud project
+
+If videos still don't post:
+   - Check Cloud Run service logs in Cloud Console
+   - Verify row H shows "success" (not an error message)
+   - Wait full 10 minutes for video generation
+
+DEPLOYMENT STEPS EXPLAINED:
+===========================
+
+The DEPLOY.ps1 script does:
+1. Creates secrets in Google Cloud Secret Manager (API keys, tokens)
+2. Grants Cloud Run service account access to those secrets
+3. Deploys the service with environment variables pointing to secrets
+4. Pulls your updated main.py code and builds a new container
+
+This is the secure way to deploy - your credentials are stored in Secret Manager, not hardcoded in the code.
