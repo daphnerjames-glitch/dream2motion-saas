@@ -1,0 +1,32 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine:latest'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine:$COMMIT_SHA'
+      - '.'
+
+  # Push the image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    args:
+      - run
+      - --filename=.
+      - --image=us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine:$COMMIT_SHA
+      - --location=us-central1
+      - --namespace=cloud-run-source-deploy
+    env:
+      - 'CLOUDSDK_RUN_REGION=us-central1'
+      - 'CLOUDSDK_RUN_PLATFORM=managed'
+
+images:
+  - 'us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine:latest'
+  - 'us-central1-docker.pkg.dev/autonomous-income-engine/cloud-run-source-deploy/autonomous-income-engine:$COMMIT_SHA'

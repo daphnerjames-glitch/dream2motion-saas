@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deploy autonomous-income-engine to Cloud Run</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; border: 1px solid #ccc; margin: 10px 0; }
+        button { padding: 10px 20px; background: #1f73e6; color: white; border: none; cursor: pointer; }
+        button:hover { background: #1557b0; }
+        .error { background: #ffcccc; color: #cc0000; }
+        .success { background: #ccffcc; color: #00cc00; }
+        .info { background: #ccf; color: #006; }
+    </style>
+</head>
+<body>
+    <h1>Deploy autonomous-income-engine to Cloud Run</h1>
+    <p>This page will submit a deployment request using your authenticated browser session.</p>
+
+    <div id="status" class="status info">Ready to deploy. Click the button below.</div>
+
+    <button onclick="deployToClouRun()">Deploy to Cloud Run</button>
+
+    <script>
+        async function deployToCloudRun() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = 'Fetching authentication...';
+
+            try {
+                // Get the project ID from the URL or use a known value
+                const projectId = 'autonomous-income-engine';
+                const region = 'us-central1';
+                const serviceName = 'autonomous-income-engine';
+
+                // Build the Cloud Build request
+                const buildRequest = {
+                    source: {
+                        repoSource: {
+                            projectId: projectId,
+                            repoName: 'autonomous-income-engine',
+                            branchName: 'main'
+                        }
+                    },
+                    steps: [
+                        {
+                            name: 'gcr.io/cloud-builders/docker',
+                            args: ['build', '-t', `gcr.io/${projectId}/${serviceName}:latest`, '.']
+                        },
+                        {
+                            name: 'gcr.io/cloud-builders/docker',
+                            args: ['push', `gcr.io/${projectId}/${serviceName}:latest`]
+                        }
+                    ],
+                    images: [`gcr.io/${projectId}/${serviceName}:latest`]
+                };
+
+                statusDiv.textContent = 'Submitting build request to Cloud Build...';
+                statusDiv.className = 'status info';
+
+                // Call Cloud Build API
+                const response = await fetch(
+                    `https://cloudbuild.googleapis.com/v1/projects/${projectId}/builds`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${await getAuthToken()}`
+                        },
+                        body: JSON.stringify(buildRequest)
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Build submission failed: ${response.status} ${response.statusText}`);
+                }
+
+                const buildData = await response.json();
+                statusDiv.innerHTML = `<strong>Build submitted successfully!</strong><br>Build ID: ${buildData.id}<br>Status: <a href="https://console.cloud.google.com/cloud-build/builds/${buildData.id}?project=${projectId}" target="_blank">View in Cloud Console</a>`;
+                statusDiv.className = 'status success';
+
+            } catch (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+                statusDiv.className = 'status error';
+                console.error('Deployment error:', error);
+            }
+        }
+
+        async function getAuthToken() {
+            // This will prompt the browser to authenticate and get a token
+            // In a real scenario, you'd use gapi.auth2 or another OAuth library
+            return new Promise((resolve) => {
+                // For testing, just resolve with a placeholder
+                // In production, use proper OAuth flow
+                resolve('YOUR_AUTH_TOKEN_HERE');
+            });
+        }
+    </script>
+</body>
+</html>

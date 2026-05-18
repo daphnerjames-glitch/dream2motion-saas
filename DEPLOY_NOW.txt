@@ -1,0 +1,51 @@
+╔════════════════════════════════════════════════════════════════════╗
+║          AUTONOMOUS INCOME ENGINE - DEPLOYMENT INSTRUCTIONS         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+CRITICAL FIX APPLIED - Cloud Run Dockerfile corrected
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+OPTION A: Windows Users (Easiest)
+──────────────────────────────────
+1. Open File Explorer
+2. Navigate to: C:\Users\daphn\Desktop\Brain
+3. Double-click: deploy.bat
+4. Command window will open and run the deployment
+5. Wait for "Service deployed" message
+6. Close when complete
+
+
+OPTION B: Command Line (All Users)
+──────────────────────────────────
+1. Open PowerShell or Command Prompt
+2. Navigate to folder:
+   cd C:\Users\daphn\Desktop\Brain
+
+3. Run deployment:
+   gcloud run deploy autonomous-income-engine --source . --region us-central1 --platform managed --project autonomous-income-engine
+
+4. Wait 2-3 minutes for deployment
+
+
+OPTION C: Cloud Console (Web)
+──────────────────────────────
+1. Go to: https://console.cloud.google.com/run?project=autonomous-income-engine
+2. Click: autonomous-income-engine
+3. Click: "Edit & deploy new revision"
+4. Click: "Deploy"
+5. Wait for deployment
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AFTER DEPLOYMENT:
+─────────────────
+✓ Open your Google Sheet
+✓ Find rows with pending posts (May 13-15)
+✓ Run testEngine() from Apps Script console
+✓ Row H should now show "success" instead of "api_error: 500"
+✓ Videos will start generating automatically
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For details, see: FIX_APPLIED.md

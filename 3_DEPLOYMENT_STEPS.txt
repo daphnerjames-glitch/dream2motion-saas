@@ -1,0 +1,29 @@
+DEPLOY SECURELY - STEP BY STEP
+
+STEP 1: Setup Secrets (1 min)
+================================
+Open Command Prompt in C:\Users\daphn\Desktop\Brain and run:
+
+setup_secrets.bat
+
+Wait for it to complete. You'll see: "✅ Secrets created and permissions granted"
+
+
+STEP 2: Deploy with Secrets (2-3 min)
+================================
+Copy and paste the deploy command from the output above. It will be:
+
+gcloud run deploy autonomous-income-engine --source . --region us-central1 --platform managed --project autonomous-income-engine --set-env-vars=YT_CLIENT_ID=sm://YT_CLIENT_ID,YT_CLIENT_SECRET=sm://YT_CLIENT_SECRET,GRANNY_YT_REFRESH=sm://GRANNY_YT_REFRESH,REBEL_YT_REFRESH=sm://REBEL_YT_REFRESH,GRANNY_BUZZSPROUT_TOKEN=sm://GRANNY_BUZZSPROUT_TOKEN,REBEL_BUZZSPROUT_TOKEN=sm://REBEL_BUZZSPROUT_TOKEN,GRANNY_BUZZSPROUT_PODCAST_ID=2615568,REBEL_BUZZSPROUT_PODCAST_ID=2615589
+
+Wait for deployment to complete. You'll see: "Service deployed and is serving 100 percent of traffic"
+
+
+STEP 3: Test Immediately
+================================
+1. Open your Google Sheet
+2. Run testEngine() from Apps Script
+3. Check row H for "success"
+4. Check row I for YouTube URLs
+5. Wait 5-10 minutes for videos to appear on YouTube channels
+
+Done.
