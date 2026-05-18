@@ -50,11 +50,50 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setVideos(data.videos || []);
+
+        // Poll for status updates on processing videos
+        const processingVideos = (data.videos || []).filter(
+          v => v.status === 'generating' || v.status === 'processing'
+        );
+
+        if (processingVideos.length > 0) {
+          processingVideos.forEach(video => {
+            pollVideoStatus(video._id, token);
+          });
+        }
       }
     } catch (err) {
       console.error('Failed to fetch videos:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const pollVideoStatus = async (videoId, authToken) => {
+    try {
+      const res = await fetch(`/api/videos/status?videoId=${videoId}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+
+        // Update the video in our state
+        setVideos(prev =>
+          prev.map(v =>
+            v._id === videoId
+              ? { ...v, status: data.status, videoUrl: data.videoUrl || v.videoUrl }
+              : v
+          )
+        );
+
+        // Continue polling if still generating
+        if (data.status === 'generating') {
+          setTimeout(() => pollVideoStatus(videoId, authToken), 10000); // Poll every 10 seconds
+        }
+      }
+    } catch (err) {
+      console.error('Failed to poll video status:', err);
     }
   };
 
@@ -135,20 +174,72 @@ export default function Dashboard() {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
               {videos.map((video) => (
-                <div key={video._id} style={{ border: '1px solid #e1e8ed', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#f9fafb' }}>
-                  <div style={{ background: '#e1e8ed', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#657786', fontSize: '40px' }}>
-                    🎬
+                <a
+                  key={video._id}
+                  href={video.status === 'completed' && video.videoUrl ? video.videoUrl : '#'}
+                  target={video.status === 'completed' && video.videoUrl ? '_blank' : ''}
+                  rel={video.status === 'completed' && video.videoUrl ? 'noopener noreferrer' : ''}
+                  style={{
+                    border: '1px solid #e1e8ed',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    backgroundColor: '#f9fafb',
+                    textDecoration: 'none',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    cursor: video.status === 'completed' && video.videoUrl ? 'pointer' : 'default',
+                    display: 'block',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (video.status === 'completed' && video.videoUrl) {
+                      e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <div style={{
+                    background: '#e1e8ed',
+                    height: '150px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#657786',
+                    fontSize: '40px',
+                    position: 'relative',
+                  }}>
+                    {video.status === 'generating' ? '⏳' : video.status === 'completed' ? '✅' : video.status === 'error' ? '❌' : '🎬'}
+                    {video.status === 'generating' && (
+                      <div style={{
+                        position: 'absolute',
+                        fontSize: '12px',
+                        bottom: '8px',
+                        color: '#657786',
+                      }}>
+                        Generating...
+                      </div>
+                    )}
                   </div>
                   <div style={{ padding: '15px' }}>
                     <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#0f1419' }}>{video.title}</h3>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#657786' }}>{video.style || 'Realistic'}</p>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#657786' }}>{video.duration || 'short'} • {video.style || 'Realistic'}</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ display: 'inline-block', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '500', backgroundColor: video.status === 'completed' ? '#d4edda' : video.status === 'processing' ? '#fff3cd' : '#f8d7da', color: video.status === 'completed' ? '#155724' : video.status === 'processing' ? '#856404' : '#721c24' }}>
-                        {video.status}
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        backgroundColor: video.status === 'completed' ? '#d4edda' : video.status === 'generating' || video.status === 'processing' ? '#fff3cd' : '#f8d7da',
+                        color: video.status === 'completed' ? '#155724' : video.status === 'generating' || video.status === 'processing' ? '#856404' : '#721c24',
+                      }}>
+                        {video.status === 'generating' ? 'Generating...' : video.status === 'completed' ? 'Ready' : video.status}
                       </span>
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           )}
