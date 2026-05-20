@@ -4,7 +4,7 @@
  */
 
 const SECURITY_TOKEN = "closetrebel2026";
-const CLOUD_FUNCTION_URL = "https://autonomous-income-engine-260985892935.us-central1.run.app/process_income_engine_pipeline";
+const CLOUD_FUNCTION_URL = "https://closet-rebel-autonomous-income-engine.vercel.app/api/income_engine";
 
 function runEtsyAutomation() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
