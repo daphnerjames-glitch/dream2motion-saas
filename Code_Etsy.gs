@@ -1,10 +1,10 @@
 /**
  * Etsy Automation - Apps Script
- * Reads Etsy sheet and sends to Cloud Function
+ * Reads Etsy sheet and sends to Closet Rebel Autonomous Income Engine
  */
 
 const SECURITY_TOKEN = "closetrebel2026";
-const CLOUD_FUNCTION_URL = "https://closet-rebel-autonomous-income-engine.vercel.app/api/income_engine";
+const INCOME_ENGINE_URL = "https://closet-rebel-autonomous-income-engine.vercel.app/api/income_engine";
 
 function runEtsyAutomation() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -21,8 +21,8 @@ function runEtsyAutomation() {
     const row = values[i];
     const rowNum = i + 1;
 
-    // Column G = Status, skip if completed
-    const status = row[6] ? String(row[6]).toLowerCase() : "";
+    // Column H = Status, skip if completed
+    const status = row[7] ? String(row[7]).toLowerCase() : "";
     if (status === "completed" || status === "error") {
       continue;
     }
@@ -34,18 +34,17 @@ function runEtsyAutomation() {
       channel: "etsy",
       rowNumber: rowNum,
       data: {
-        date: row[0],
-        title: row[1],
-        description: row[2],
-        tags: row[3],
-        apiKey: row[4],
-        postUrl: row[5],
-        status: row[6],
-        notes: row[7]
+        date: row[2],
+        title: row[0],
+        description: row[1],
+        tags: row[6],
+        price: row[5],
+        status: row[7],
+        notes: row[8]
       }
     };
 
-    // Send to Cloud Function
+    // Send to Income Engine API
     const options = {
       method: "post",
       contentType: "application/json",
@@ -54,7 +53,7 @@ function runEtsyAutomation() {
     };
 
     try {
-      const response = UrlFetchApp.fetch(CLOUD_FUNCTION_URL, options);
+      const response = UrlFetchApp.fetch(INCOME_ENGINE_URL, options);
       const responseCode = response.getResponseCode();
 
       Logger.log("Row " + rowNum + " sent. Response: " + responseCode);
